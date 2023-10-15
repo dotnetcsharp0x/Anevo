@@ -27,7 +27,7 @@ public class TestController : ControllerBase
     public IEnumerable<Users> GetUser()
     {
         List<Users> usr = new List<Users>();
-        Users us = new Users();
+        Users us = new Users(); // Создаем пустышку для вывода в API
         us.Id=1;
         us.FirstName="Dmitry";
         us.LastName="Sotnikov";
