@@ -36,16 +36,23 @@ public class TestController : ControllerBase
         usr.Add(us);
         return usr;
     }
+    
+    [Authorize(Roles = UserRoles.Admin)]
+    [HttpGet("admin")]
+    public string Admin() {
+        
+        return "Ok";
+    }
 
     [AllowAnonymous]
     [HttpPost]
     [Route("Authenticate")]
-    public string Authenticate(int minutes)
+    public string Authenticate(int minutes, string role="Admin")
     {
         List<Claim> claims = new List<Claim>();
         claims.Add(new Claim(ClaimTypes.Name,"Dmitriy")); // Передаем в токен Имя
         claims.Add(new Claim("level","123")); // Передаем в токен кастомное поле
-        claims.Add(new Claim(ClaimTypes.Role,"Admin")); // Передаем в токен роль
+        claims.Add(new Claim(ClaimTypes.Role,role)); // Передаем в токен роль
         var signingKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_options.SecretKey));
 
         var jwt = new JwtSecurityToken (
