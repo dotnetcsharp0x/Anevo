@@ -7,8 +7,11 @@ using Anevo;
 using Anevo.Handlers;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.OpenApi.Models;
+using Anevo.Data;
 
 var builder = WebApplication.CreateBuilder(args);
+string connection = builder.Configuration.GetConnectionString("DefaultConnection");
+builder.Services.AddDbContext<ApplicationContext>(options => options.UseSqlServer(connection));
 
 builder.Services.AddControllers();
 builder.Services.AddAuthorization();

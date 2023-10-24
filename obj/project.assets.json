@@ -3075,24 +3075,31 @@
     ]
   },
   "packageFolders": {
-    "/home/rubi/.nuget/packages/": {}
+    "C:\\Users\\New\\.nuget\\packages\\": {},
+    "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "/media/rubi/ADATA SE900G/projects/Anevo/Anevo.csproj",
+      "projectUniqueName": "C:\\Users\\New\\Source\\Repos\\Anevo\\Anevo.csproj",
       "projectName": "Anevo",
-      "projectPath": "/media/rubi/ADATA SE900G/projects/Anevo/Anevo.csproj",
-      "packagesPath": "/home/rubi/.nuget/packages/",
-      "outputPath": "/media/rubi/ADATA SE900G/projects/Anevo/obj/",
+      "projectPath": "C:\\Users\\New\\Source\\Repos\\Anevo\\Anevo.csproj",
+      "packagesPath": "C:\\Users\\New\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\New\\Source\\Repos\\Anevo\\obj\\",
       "projectStyle": "PackageReference",
+      "fallbackFolders": [
+        "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+      ],
       "configFilePaths": [
-        "/home/rubi/.nuget/NuGet/NuGet.Config"
+        "C:\\Users\\New\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
+        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [
         "net7.0"
       ],
       "sources": {
+        "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
         "https://api.nuget.org/v3/index.json": {}
       },
       "frameworks": {
@@ -3161,7 +3168,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "/usr/lib/dotnet/sdk/7.0.110/RuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.100-rc.2.23502.2\\RuntimeIdentifierGraph.json"
       }
     }
   }
