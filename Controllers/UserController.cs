@@ -7,6 +7,7 @@ using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Anevo.Models.User;
 using Anevo.Data;
+using Anevo.Handlers;
 
 namespace Anevo.Controllers;
 
@@ -27,7 +28,7 @@ public class UserController : ControllerBase
         _context = context;
     }
 
-    [HttpGet("getuser")]
+    [HttpGet("GetUser")]
     [AllowAnonymous]
     public IEnumerable<Users> GetUser(string username)
     {
@@ -43,27 +44,26 @@ public class UserController : ControllerBase
 
     [AllowAnonymous]
     [HttpPost]
-    [Route("Authenticate")]
-    public string Authenticate(Users user)
+    [Route("Register")]
+    public async Task<string> Register(Users user)
+    {
+        _context.Users.Add(user);
+        CreateJWTToken cjwttoken = new CreateJWTToken(user, _options);
+        string resp = await cjwttoken.CreateToken();
+        await _context.SaveChangesAsync();
+        return resp;
+    }
+
+    [AllowAnonymous]
+    [HttpPost]
+    [Route("Login")]
+    public async Task<string> Login(Users user)
     {
         var find_user = (from i in _context.Users where i.UserName == user.UserName select i).FirstOrDefault();
         if (find_user != null)
         {
-            List<Claim> claims = new List<Claim>();
-            claims.Add(new Claim(ClaimTypes.Name, find_user.UserName)); // Передаем в токен Имя
-            claims.Add(new Claim("level", "123")); // Передаем в токен кастомное поле
-            claims.Add(new Claim(ClaimTypes.Role, find_user.UserName)); // Передаем в токен роль
-            var signingKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_options.SecretKey));
-
-            var jwt = new JwtSecurityToken(
-                issuer: _options.Issuer,
-                audience: _options.Audience,
-                claims: claims,
-                expires: DateTime.UtcNow.Add(TimeSpan.FromMinutes(1000)), // Действие токена 10 минут
-                notBefore: DateTime.UtcNow,
-                signingCredentials: new SigningCredentials(signingKey, SecurityAlgorithms.HmacSha256)
-            );
-            var resp = new JwtSecurityTokenHandler().WriteToken(jwt);
+            CreateJWTToken cjwttoken = new CreateJWTToken(user,_options);
+            string resp = await cjwttoken.CreateToken();
             return resp;
         }
         else
