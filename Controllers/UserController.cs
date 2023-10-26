@@ -29,10 +29,9 @@ public class UserController : ControllerBase
     }
 
     [HttpGet("GetUser")]
-    [AllowAnonymous]
-    public IEnumerable<Users> GetUser(string username)
+    public IEnumerable<Users> GetUser(string email)
     {
-        return _context.Users.Where(x => x.UserName == username);
+        return _context.Users.Where(x => x.Email == email);
     }
     
     [Authorize(Roles = UserRoles.Admin)]
@@ -57,9 +56,9 @@ public class UserController : ControllerBase
     [AllowAnonymous]
     [HttpPost]
     [Route("Login")]
-    public async Task<string> Login(Users user)
+    public async Task<string> Login(LoginTemplate user)
     {
-        var find_user = (from i in _context.Users where i.UserName == user.UserName select i).FirstOrDefault();
+        var find_user = (from i in _context.Users where i.Email == user.Email select i).FirstOrDefault();
         if (find_user != null)
         {
             CreateJWTToken cjwttoken = new CreateJWTToken(user,_options);

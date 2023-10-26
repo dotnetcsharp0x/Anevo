@@ -13,10 +13,17 @@ var builder = WebApplication.CreateBuilder(args);
 string connection = builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddDbContext<ApplicationContext>(options => options.UseSqlServer(connection));
 
+builder.Services.AddCors(o => o.AddPolicy("MyPolicy", builder =>
+{
+    builder.AllowAnyMethod()
+           .AllowAnyHeader()
+           .AllowAnyOrigin();
+}));
+
 builder.Services.AddControllers();
 builder.Services.AddAuthorization();
 builder.Services.AddSwaggerGen(option => {
-    option.SwaggerDoc("v1",new OpenApiInfo { Title = "rubiAPi", Version = "v1"});
+    option.SwaggerDoc("v1",new OpenApiInfo { Title = "myHoldAPI", Version = "v1"});
     option.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme {
         In = ParameterLocation.Header,
         Description = "Please enter token",
@@ -78,7 +85,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-
+app.UseCors("MyPolicy");
 app.UseAuthentication();
 app.UseAuthorization();
 
