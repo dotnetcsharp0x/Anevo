@@ -1,4 +1,5 @@
-﻿using Anevo.Models.User;
+﻿using Anevo.Models.Tables.Groups;
+using Anevo.Models.Tables.User;
 using Microsoft.EntityFrameworkCore;
 
 namespace Anevo.Data
@@ -13,14 +14,14 @@ namespace Anevo.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<SU001>().HasKey(u => new { u.SU001_Id });
-            modelBuilder.Entity<SU010>().HasKey(u => new { u.SU010_Id });
+            modelBuilder.Entity<SG_001>().HasKey(u => new { u.SG001_Id });
+            modelBuilder.Entity<SG_010>().HasKey(u => new { u.SG010_Id });
         }
 
-        public DbSet<Users> Users { get; set; }
-        public DbSet<SU001> SU001 { get; set; }
+        public DbSet<SU_001> SU_001 { get; set; }
+        public DbSet<SG_001> SG_001 { get; set; }
 
-        public DbSet<SU010> SU010 { get; set; }
+        public DbSet<SG_010> SG_010 { get; set; }
 
         ~ApplicationContext()
         {

@@ -2,12 +2,12 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace Anevo.Models.User
+namespace Anevo.Models.Tables.Groups
 {
-    public class SU001
+    public class SG_001
     {
-        public int SU001_Id { get; set; }
+        public int SG001_Id { get; set; }
         public int SU001_Id_User { get; set; }
-        public int SU001_GroupNr {  get; set; }
+        public int SG001_GroupNr { get; set; }
     }
 }
