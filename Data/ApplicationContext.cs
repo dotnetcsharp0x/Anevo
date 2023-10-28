@@ -11,7 +11,16 @@ namespace Anevo.Data
             Database.EnsureCreated();   // создаем базу данных при первом обращении
         }
 
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<SU001>().HasKey(u => new { u.SU001_Id });
+            modelBuilder.Entity<SU010>().HasKey(u => new { u.SU010_Id });
+        }
+
         public DbSet<Users> Users { get; set; }
+        public DbSet<SU001> SU001 { get; set; }
+
+        public DbSet<SU010> SU010 { get; set; }
 
         ~ApplicationContext()
         {

@@ -10,25 +10,22 @@ namespace Anevo.Handlers
     {
         private Users _users;
         private JWTSettings _options;
-        public CreateJWTToken(Users users, JWTSettings options)
-        {
-            _users = users;
-            _options = options;
-        }
+        private LoginTemplate _loginTemplate;
         public CreateJWTToken(LoginTemplate users, JWTSettings options)
         {
             Users c_user = new Users();
-            c_user.Email = users.Email;
-            c_user.Password = users.Password;
+            c_user.Email = users.users.Email;
+            c_user.Password = users.users.Password;
             _users = c_user;
             _options = options;
+            _loginTemplate = users;
         }
         public async Task<string> CreateToken()
         {
             List<Claim> claims = new List<Claim>();
             claims.Add(new Claim(ClaimTypes.Name, _users.Email)); // Передаем в токен Имя
-            claims.Add(new Claim("level", "123")); // Передаем в токен кастомное поле
-            claims.Add(new Claim(ClaimTypes.Role, _users.Email)); // Передаем в токен роль
+            claims.Add(new Claim(ClaimTypes.GroupSid, _loginTemplate.SU001.SU001_GroupNr.ToString())); // Передаем в токен кастомное поле
+            claims.Add(new Claim(ClaimTypes.Role, _loginTemplate.SU010.SU010_Name)); // Передаем в токен роль
             var signingKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_options.SecretKey));
 
             var jwt = new JwtSecurityToken(

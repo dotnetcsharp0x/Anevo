@@ -2,7 +2,8 @@
 {
     public class LoginTemplate
     {
-        public string Email { get; set; }
-        public string Password { get; set; }
+        public Users users { get; set; }
+        public SU010 SU010 { get; set; }
+        public SU001 SU001 { get; set; }
     }
 }
