@@ -11,6 +11,7 @@ using Anevo.Handlers;
 using System.Net;
 using RestSharp;
 using Nancy.Json;
+using Anevo.Enums.SU0010;
 
 namespace Anevo.Controllers;
 
@@ -59,16 +60,11 @@ public class UserController : ControllerBase
             loginTemplate.users = user;
             await _context.SaveChangesAsync();
             find_user = (from i in _context.Users where i.Email == user.Email select i).FirstOrDefault();
-            _context.SU001.Add(new SU001 { SU001_Id_User = user.Id, SU001_GroupNr = 2 });
+            _context.SU001.Add(new SU001 { SU001_Id_User = user.Id, SU001_GroupNr = (int)SU010_Types.User });
             await _context.SaveChangesAsync();
-            var MyUrl = Request.Host.Value;
-            string url = "https://"+MyUrl+"/api/User/Login";
-            var client = new RestClient(url);
-            var request = new RestRequest(url, Method.Post);
-            request.AddHeader("Content-Type", "application/json");
-            request.AddJsonBody(loginTemplate.users);
-            string jwt_resp = client.ExecuteAsync(request).Result.Content;
-            return Content(jwt_resp);
+            var jwt_resp = Login(loginTemplate.users).Result.ExecuteResultAsync;
+            var resp = (ContentResult)jwt_resp.Target;
+            return Content(resp.Content.ToString());
         }
         else
         {
