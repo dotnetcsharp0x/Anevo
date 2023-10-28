@@ -6,7 +6,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Anevo.Data;
-using Anevo.Handlers;
 using System.Net;
 using RestSharp;
 using Nancy.Json;
@@ -16,6 +15,7 @@ using Anevo.Models;
 using Anevo.Models.Tables.User;
 using Anevo.Actions.Users;
 using Microsoft.EntityFrameworkCore;
+using Anevo.Actions.JWT;
 
 namespace Anevo.Controllers;
 
@@ -61,14 +61,11 @@ public class UserController : ControllerBase
         var find_user = await _userActions.GetUserByEmail(user.Email);
         if (find_user == null)
         {
-            _context.SU_001.Add(user);
-
+            await _userActions.CreateUser(user);
             LoginTemplate loginTemplate = new LoginTemplate();
             loginTemplate.SU_001 = user;
-            await _context.SaveChangesAsync();
             find_user = await _userActions.GetUserByEmail(user.Email);
             await _userGroups.AddUserToGroup(loginTemplate.SU_001,SU010_Types.User);
-            await _context.SaveChangesAsync();
             var jwt_resp = Login(loginTemplate.SU_001).Result.ExecuteResultAsync;
             var resp = (ContentResult)jwt_resp.Target;
             return Content(resp.Content.ToString());

@@ -4,10 +4,10 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using System.Text.Json.Serialization;
 using Anevo;
-using Anevo.Handlers;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.OpenApi.Models;
 using Anevo.Data;
+using Anevo.Actions.JWT;
 
 var builder = WebApplication.CreateBuilder(args);
 string connection = builder.Configuration.GetConnectionString("DefaultConnection");

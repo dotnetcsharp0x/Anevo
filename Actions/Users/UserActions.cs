@@ -21,5 +21,11 @@ namespace Anevo.Actions.Users
         {
             return await _context.SU_001.ToListAsync();
         }
+
+        public async Task CreateUser(SU_001 user)
+        {
+            await _context.SU_001.AddAsync(user);
+            await _context.SaveChangesAsync();
+        }
     }
 }

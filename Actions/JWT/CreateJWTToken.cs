@@ -5,7 +5,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 
-namespace Anevo.Handlers
+namespace Anevo.Actions.JWT
 {
     public class CreateJWTToken
     {
@@ -33,12 +33,11 @@ namespace Anevo.Handlers
                 issuer: _options.Issuer,
                 audience: _options.Audience,
                 claims: claims,
-                expires: DateTime.UtcNow.Add(TimeSpan.FromMinutes(1000)), // Действие токена 10 минут
+                expires: DateTime.UtcNow.Add(TimeSpan.FromMinutes(1000)), // Действие токена 1000 минут
                 notBefore: DateTime.UtcNow,
                 signingCredentials: new SigningCredentials(signingKey, SecurityAlgorithms.HmacSha256)
             );
-            var resp = new JwtSecurityTokenHandler().WriteToken(jwt);
-            return resp;
+            return new JwtSecurityTokenHandler().WriteToken(jwt);
         }
     }
 }
