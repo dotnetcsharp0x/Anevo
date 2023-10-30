@@ -8,6 +8,8 @@ using Microsoft.AspNetCore.Components.Web;
 using Microsoft.OpenApi.Models;
 using Anevo.Data;
 using Anevo.Actions.JWT;
+using Anevo.Interfaces.JWT;
+using Microsoft.Extensions.Configuration;
 
 var builder = WebApplication.CreateBuilder(args);
 string connection = builder.Configuration.GetConnectionString("DefaultConnection");
@@ -19,6 +21,7 @@ builder.Services.AddCors(o => o.AddPolicy("MyPolicy", builder =>
            .AllowAnyHeader()
            .AllowAnyOrigin();
 }));
+
 
 builder.Services.AddControllers();
 builder.Services.AddAuthorization();
@@ -48,6 +51,7 @@ builder.Services.AddSwaggerGen(option => {
 });
 
 #region Auth
+builder.Services.AddOptions();
 builder.Services.Configure<JWTSettings>(builder.Configuration.GetSection("JWTSettings")); // Сопоставление JWTSettings с файлом конфигурации appsettings.json
 
 var secretKey = builder.Configuration.GetSection("JWTSettings:SecretKey").Value; // Секретный код из appsettings.json
@@ -75,7 +79,7 @@ builder.Services.AddAuthentication(option => { // Указываем аутен�
     };
 });
 #endregion
-
+builder.Services.AddTransient<ITokenService, CreateJWTToken>();
 var app = builder.Build();
 
 app.UseHttpsRedirection();

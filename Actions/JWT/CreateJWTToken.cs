@@ -1,43 +1,65 @@
-﻿using Anevo.Models;
+﻿using Anevo.Data;
+using Anevo.Interfaces.JWT;
+using Anevo.Models;
 using Anevo.Models.Tables.User;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using System.Security.Cryptography;
 using System.Text;
 
 namespace Anevo.Actions.JWT
 {
-    public class CreateJWTToken
+    public class CreateJWTToken : ITokenService
     {
-        private SU_001 _users;
-        private JWTSettings _options;
-        private LoginTemplate _loginTemplate;
-        public CreateJWTToken(LoginTemplate users, JWTSettings options)
+        private readonly IOptions<JWTSettings> _config;
+        public CreateJWTToken(IOptions<JWTSettings> config)
         {
-            SU_001 c_user = new SU_001();
-            c_user.Email = users.SU_001.Email;
-            c_user.Password = users.SU_001.Password;
-            _users = c_user;
-            _options = options;
-            _loginTemplate = users;
+            _config = config;
         }
-        public async Task<string> CreateToken()
+        public ClaimsPrincipal GetPrincipalFromExpiredToken(string token)
         {
-            List<Claim> claims = new List<Claim>();
-            claims.Add(new Claim(ClaimTypes.Name, _users.Email)); // Передаем в токен Имя
-            claims.Add(new Claim(ClaimTypes.GroupSid, _loginTemplate.SG_001.SG001_GroupNr.ToString())); // Передаем в токен кастомное поле
-            claims.Add(new Claim(ClaimTypes.Role, _loginTemplate.SG_010.SU010_Name)); // Передаем в токен роль
-            var signingKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_options.SecretKey));
+            var tokenValidationParameters = new TokenValidationParameters
+            {
+                ValidateAudience = false, //you might want to validate the audience and issuer depending on your use case
+                ValidateIssuer = false,
+                ValidateIssuerSigningKey = true,
+                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config.Value.SecretKey)),
+                ValidateLifetime = false //here we are saying that we don't care about the token's expiration date
+            };
+            var tokenHandler = new JwtSecurityTokenHandler();
+            SecurityToken securityToken;
+            var principal = tokenHandler.ValidateToken(token, tokenValidationParameters, out securityToken);
+            var jwtSecurityToken = securityToken as JwtSecurityToken;
+            if (jwtSecurityToken == null || !jwtSecurityToken.Header.Alg.Equals(SecurityAlgorithms.HmacSha256, StringComparison.InvariantCultureIgnoreCase))
+                throw new SecurityTokenException("Invalid token");
+            return principal;
+        }
+
+        public string GenerateAccessToken(IEnumerable<Claim> claims)
+        {
+            var signingKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config.Value.SecretKey));
 
             var jwt = new JwtSecurityToken(
-                issuer: _options.Issuer,
-                audience: _options.Audience,
+                issuer: _config.Value.Issuer,
+                audience: _config.Value.Audience,
                 claims: claims,
-                expires: DateTime.UtcNow.Add(TimeSpan.FromMinutes(1000)), // Действие токена 1000 минут
+                expires: DateTime.UtcNow.Add(TimeSpan.FromMinutes(1440)), // Действие токена 1440 минут
                 notBefore: DateTime.UtcNow,
                 signingCredentials: new SigningCredentials(signingKey, SecurityAlgorithms.HmacSha256)
             );
             return new JwtSecurityTokenHandler().WriteToken(jwt);
+        }
+
+        public string GenerateRefreshToken()
+        {
+            var randomNumber = new byte[32];
+            using (var rng = RandomNumberGenerator.Create())
+            {
+                rng.GetBytes(randomNumber);
+                return Convert.ToBase64String(randomNumber);
+            }
         }
     }
 }
