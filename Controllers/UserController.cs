@@ -18,6 +18,7 @@ using Microsoft.EntityFrameworkCore;
 using Anevo.Actions.JWT;
 using Anevo.Models.JWT;
 using Anevo.Interfaces.JWT;
+using System;
 
 namespace Anevo.Controllers;
 
@@ -105,9 +106,9 @@ public class UserController : ControllerBase
                 new Claim(ClaimTypes.GroupSid, login_template.SG_001.SG001_GroupNr.ToString()), 
                 new Claim(ClaimTypes.Role, login_template.SG_010.SU010_Name) 
             };
-            aresp.Token = cjwttoken.GenerateAccessToken(claims);
+            aresp.AccessToken = cjwttoken.GenerateAccessToken(claims);
             aresp.RefreshToken = cjwttoken.GenerateRefreshToken();
-            find_user.RefreshToken = aresp.RefreshToken;
+            find_user.RefreshToken = aresp.AccessToken;
             find_user.RefreshTokenExpiryTime = DateTime.Now.AddMinutes(43200);
             await _context.SaveChangesAsync();
             return Ok(aresp);
@@ -118,6 +119,23 @@ public class UserController : ControllerBase
         }
     }
 
+    [AllowAnonymous]
+    [HttpGet]
+    [Route("ReadJWT")]
+    public IEnumerable<JWTModel> ReadJWT(string jwt = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1lIjoic3RyaW5nIiwiaHR0cDovL3NjaGVtYXMubWljcm9zb2Z0LmNvbS93cy8yMDA4LzA2L2lkZW50aXR5L2NsYWltcy9ncm91cHNpZCI6IjEiLCJodHRwOi8vc2NoZW1hcy5taWNyb3NvZnQuY29tL3dzLzIwMDgvMDYvaWRlbnRpdHkvY2xhaW1zL3JvbGUiOiJBZG1pbiIsIm5iZiI6MTY5ODgyOTE2NywiZXhwIjoxNjk4OTE1NTY3LCJpc3MiOiJteWhvbGQiLCJhdWQiOiJteWhvbGQifQ.SeX-GrYtMEDdm-nzjystXbQjdLpccndGrODQJHJv7k8")
+    {
+        var handler = new JwtSecurityTokenHandler();
+        var token = handler.ReadJwtToken(jwt);
+        var resp = (from i in token.Claims select new JWTModel { type = i.Type, value = i.Value}).Where(x=>x.type.Contains("identity")).ToList();
+        foreach(var x in resp)
+        {
+            x.type = new Uri(x.type).Segments.Last();
+        }
+
+        return resp;
+    }
+
+    [AllowAnonymous]
     [HttpPost]
     [Route("refresh")]
     public async Task<IActionResult> Refresh(TokenApiModel tokenApiModel)
@@ -129,15 +147,15 @@ public class UserController : ControllerBase
         var principal = _tokenService.GetPrincipalFromExpiredToken(accessToken);
         var email = principal.Identity.Name;
         var user = _userActions.GetUserByEmail(email).Result;
-        if (user is null || user.RefreshToken != refreshToken || user.RefreshTokenExpiryTime <= DateTime.Now)
+        if (user is null || user.RefreshToken != accessToken || user.RefreshTokenExpiryTime <= DateTime.Now)
             return BadRequest("Invalid client request");
         var newAccessToken = _tokenService.GenerateAccessToken(principal.Claims);
         var newRefreshToken = _tokenService.GenerateRefreshToken();
-        user.RefreshToken = newRefreshToken;
+        user.RefreshToken = newAccessToken;
         await _context.SaveChangesAsync();
         return Ok(new AuthenticatedResponse()
         {
-            Token = newAccessToken,
+            AccessToken = newAccessToken,
             RefreshToken = newRefreshToken
         });
     }

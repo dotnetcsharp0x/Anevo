@@ -45,7 +45,7 @@ namespace Anevo.Actions.JWT
                 issuer: _config.Value.Issuer,
                 audience: _config.Value.Audience,
                 claims: claims,
-                expires: DateTime.UtcNow.Add(TimeSpan.FromMinutes(1440)), // Действие токена 1440 минут
+                expires: DateTime.UtcNow.Add(TimeSpan.FromMinutes(1)), // Действие токена 30 минут
                 notBefore: DateTime.UtcNow,
                 signingCredentials: new SigningCredentials(signingKey, SecurityAlgorithms.HmacSha256)
             );
