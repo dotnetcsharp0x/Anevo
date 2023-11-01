@@ -10,6 +10,9 @@ using Anevo.Data;
 using Anevo.Actions.JWT;
 using Anevo.Interfaces.JWT;
 using Microsoft.Extensions.Configuration;
+using System.Net;
+using Microsoft.AspNetCore.Server.Kestrel.Https;
+using System.Security.Cryptography.X509Certificates;
 
 var builder = WebApplication.CreateBuilder(args);
 string connection = builder.Configuration.GetConnectionString("DefaultConnection");
@@ -22,7 +25,18 @@ builder.Services.AddCors(o => o.AddPolicy("MyPolicy", builder =>
            .AllowAnyOrigin();
 }));
 
+var httpsConnectionAdapterOptions = new HttpsConnectionAdapterOptions
+{
+    SslProtocols = System.Security.Authentication.SslProtocols.Tls12,
+    ClientCertificateMode = ClientCertificateMode.AllowCertificate,
+    ServerCertificate = new X509Certificate2("certificate_cert_out.pfx", "1234")
 
+};
+builder.Services.AddHttpsRedirection(options =>
+{
+    options.RedirectStatusCode = (int)HttpStatusCode.TemporaryRedirect;
+    options.HttpsPort = 5001;
+});
 builder.Services.AddControllers();
 builder.Services.AddAuthorization();
 builder.Services.AddSwaggerGen(option => {
@@ -48,6 +62,14 @@ builder.Services.AddSwaggerGen(option => {
             }, new string[]{}
         }
     });
+});
+builder.WebHost.ConfigureKestrel(serverOptions =>
+{
+    serverOptions.Listen(IPAddress.Parse("192.168.1.85"), 5000);
+    serverOptions.Listen(IPAddress.Parse("192.168.1.85"), 5001, listenOptions =>
+        {
+            listenOptions.UseHttps("certificate_cert_out.pfx", "1234");
+        });
 });
 
 #region Auth
@@ -82,13 +104,12 @@ builder.Services.AddAuthentication(option => { // Указываем аутен�
 builder.Services.AddTransient<ITokenService, CreateJWTToken>();
 var app = builder.Build();
 
-app.UseHttpsRedirection();
+app.UseHttpsRedirection().UseCertificateForwarding().UseCors().UseHsts();
 
-if (app.Environment.IsDevelopment())
-{
+
     app.UseSwagger();
     app.UseSwaggerUI();
-}
+
 app.UseCors("MyPolicy");
 app.UseAuthentication();
 app.UseAuthorization();

@@ -73,8 +73,9 @@ public class UserController : ControllerBase
             find_user = await _userActions.GetUserByEmail(user.Email);
             await _userGroups.AddUserToGroup(loginTemplate.SU_001,SU010_Types.User);
             var jwt_resp = Login(loginTemplate.SU_001).Result.ExecuteResultAsync;
-            var resp = (ContentResult)jwt_resp.Target;
-            return Content(resp.Content.ToString());
+            var resp = (OkObjectResult)jwt_resp.Target;
+            var aresp = resp.Value;
+            return Ok(aresp);
         }
         else
         {
@@ -107,7 +108,7 @@ public class UserController : ControllerBase
             aresp.Token = cjwttoken.GenerateAccessToken(claims);
             aresp.RefreshToken = cjwttoken.GenerateRefreshToken();
             find_user.RefreshToken = aresp.RefreshToken;
-            find_user.RefreshTokenExpiryTime = DateTime.Now.AddMinutes(1440);
+            find_user.RefreshTokenExpiryTime = DateTime.Now.AddMinutes(43200);
             await _context.SaveChangesAsync();
             return Ok(aresp);
         }
