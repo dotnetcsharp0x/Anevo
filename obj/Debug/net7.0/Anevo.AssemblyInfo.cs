@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Anevo")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+ee819022237f1c0e9064363b689d2657a2e38481")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+f05bed44193a780db0deaa14cd856321d5d1dfb3")]
 [assembly: System.Reflection.AssemblyProductAttribute("Anevo")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Anevo")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

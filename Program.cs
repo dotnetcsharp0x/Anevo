@@ -18,25 +18,9 @@ var builder = WebApplication.CreateBuilder(args);
 string connection = builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddDbContext<ApplicationContext>(options => options.UseSqlServer(connection));
 
-builder.Services.AddCors(o => o.AddPolicy("MyPolicy", builder =>
-{
-    builder.AllowAnyMethod()
-           .AllowAnyHeader()
-           .AllowAnyOrigin();
-}));
 
-var httpsConnectionAdapterOptions = new HttpsConnectionAdapterOptions
-{
-    SslProtocols = System.Security.Authentication.SslProtocols.Tls12,
-    ClientCertificateMode = ClientCertificateMode.AllowCertificate,
-    ServerCertificate = new X509Certificate2("certificate_cert_out.pfx", "1234")
+builder.WebHost.UseUrls("http://localhost:5000;https://localhost:5001;");
 
-};
-builder.Services.AddHttpsRedirection(options =>
-{
-    options.RedirectStatusCode = (int)HttpStatusCode.TemporaryRedirect;
-    options.HttpsPort = 5001;
-});
 builder.Services.AddControllers();
 builder.Services.AddAuthorization();
 builder.Services.AddSwaggerGen(option => {
@@ -63,14 +47,7 @@ builder.Services.AddSwaggerGen(option => {
         }
     });
 });
-builder.WebHost.ConfigureKestrel(serverOptions =>
-{
-    serverOptions.Listen(IPAddress.Parse("192.168.1.85"), 5000);
-    serverOptions.Listen(IPAddress.Parse("192.168.1.85"), 5001, listenOptions =>
-        {
-            listenOptions.UseHttps("certificate_cert_out.pfx", "1234");
-        });
-});
+
 
 #region Auth
 builder.Services.AddOptions();
@@ -104,13 +81,11 @@ builder.Services.AddAuthentication(option => { // Указываем аутен�
 builder.Services.AddTransient<ITokenService, CreateJWTToken>();
 var app = builder.Build();
 
-app.UseHttpsRedirection().UseCertificateForwarding().UseCors().UseHsts();
-
 
     app.UseSwagger();
     app.UseSwaggerUI();
+app.UseHttpsRedirection();
 
-app.UseCors("MyPolicy");
 app.UseAuthentication();
 app.UseAuthorization();
 

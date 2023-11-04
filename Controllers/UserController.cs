@@ -102,9 +102,12 @@ public class UserController : ControllerBase
             AuthenticatedResponse aresp = new AuthenticatedResponse();
             List<Claim> claims = new List<Claim>
             {
+                new Claim("Name", find_user.Email),
                 new Claim(ClaimTypes.Name, find_user.Email),
+                new Claim("GroupSid", login_template.SG_001.SG001_GroupNr.ToString()), 
                 new Claim(ClaimTypes.GroupSid, login_template.SG_001.SG001_GroupNr.ToString()), 
-                new Claim(ClaimTypes.Role, login_template.SG_010.SU010_Name) 
+                new Claim("Role", login_template.SG_010.SU010_Name),
+                new Claim(ClaimTypes.Role, login_template.SG_010.SU010_Name)
             };
             aresp.AccessToken = cjwttoken.GenerateAccessToken(claims);
             aresp.RefreshToken = cjwttoken.GenerateRefreshToken();
@@ -145,9 +148,9 @@ public class UserController : ControllerBase
         string accessToken = tokenApiModel.AccessToken;
         string refreshToken = tokenApiModel.RefreshToken;
         var principal = _tokenService.GetPrincipalFromExpiredToken(accessToken);
-        var email = principal.Identity.Name;
+        var email = (from i in principal.Claims where i.Type=="Name" select i.Value).First();
         var user = _userActions.GetUserByEmail(email).Result;
-        if (user is null || user.RefreshToken != accessToken || user.RefreshTokenExpiryTime <= DateTime.Now)
+        if (user is null || user.RefreshTokenExpiryTime <= DateTime.Now)
             return BadRequest("Invalid client request");
         var newAccessToken = _tokenService.GenerateAccessToken(principal.Claims);
         var newRefreshToken = _tokenService.GenerateRefreshToken();
