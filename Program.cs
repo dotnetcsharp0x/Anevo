@@ -82,8 +82,8 @@ builder.Services.AddTransient<ITokenService, CreateJWTToken>();
 var app = builder.Build();
 
 
-    app.UseSwagger();
-    app.UseSwaggerUI();
+app.UseSwagger();
+app.UseSwaggerUI();
 app.UseHttpsRedirection();
 
 app.UseAuthentication();
