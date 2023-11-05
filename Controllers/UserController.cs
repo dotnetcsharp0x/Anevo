@@ -19,6 +19,7 @@ using Anevo.Actions.JWT;
 using Anevo.Models.JWT;
 using Anevo.Interfaces.JWT;
 using System;
+using Newtonsoft.Json.Serialization;
 
 namespace Anevo.Controllers;
 
@@ -49,9 +50,10 @@ public class UserController : ControllerBase
     [HttpGet]
     [Authorize(Roles = UserRolesTemplate.Admin)]
     [Route("GetUsers")]
-    public async Task<List<SU_001>> GetUsers()
+    public async Task<HashSet<SU_001>> GetUsers()
     {
-        return await _userActions.GetUsers();
+        var resp = await _userActions.GetUsers();
+        return resp.ToHashSet();
     }
     
     [HttpGet("GetUserByEmail")]

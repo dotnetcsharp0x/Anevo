@@ -155,3 +155,4 @@ C:\Users\New\Source\Repos\Anevo\obj\Debug\net7.0\ref\Anevo.dll
 C:\Users\New\source\repos\Anevo\bin\Debug\net7.0\Microsoft.Extensions.PlatformAbstractions.dll
 C:\Users\New\source\repos\Anevo\bin\Debug\net7.0\Nancy.dll
 C:\Users\New\source\repos\Anevo\bin\Debug\net7.0\RestSharp.dll
+C:\Users\New\source\repos\Anevo\bin\Debug\net7.0\Newtonsoft.Json.dll
