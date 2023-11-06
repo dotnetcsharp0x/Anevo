@@ -1,6 +1,6 @@
-﻿using Anevo.Models.Tables.Groups;
-using Anevo.Models.Tables.User;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
+using Skymey_main_lib.Models.Tables.Groups;
+using Skymey_main_lib.Models.Tables.User;
 
 namespace Anevo.Data
 {

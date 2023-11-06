@@ -1,8 +1,6 @@
 ﻿using Anevo.Data;
-using Anevo.Enums.SU0010;
-using Anevo.Models.Tables.Groups;
-using Anevo.Models.Tables.User;
 using Microsoft.EntityFrameworkCore;
+using Skymey_main_lib.Models.Tables.User;
 
 namespace Anevo.Actions.Users
 {

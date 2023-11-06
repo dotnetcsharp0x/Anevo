@@ -1,9 +1,7 @@
 ﻿using Anevo.Data;
-using Anevo.Interfaces.JWT;
-using Anevo.Models;
-using Anevo.Models.Tables.User;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
+using Skymey_main_lib.Interfaces.JWT;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
