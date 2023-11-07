@@ -20,6 +20,11 @@ using Skymey_main_lib.Models.Tables.User;
 using Skymey_main_lib.Interfaces.JWT;
 using Skymey_main_lib.Models;
 using Skymey_main_lib.Enums.SU0010;
+using Microsoft.AspNetCore.Identity;
+using BC = BCrypt.Net.BCrypt;
+using System.Text.Json;
+using Nancy;
+using System.Net;
 
 namespace Anevo.Controllers;
 
@@ -67,18 +72,50 @@ public class UserController : ControllerBase
     [Route("Register")]
     public async Task<ActionResult> Register(SU_001 user)
     {
+        SU_001 user_login = new SU_001();
+        user_login.Email = user.Email;
+        user_login.Password = user.Password;
+        user_login.FirstName = user.FirstName;
+        user_login.LastName = user.LastName;
+        user_login.RefreshToken = user.RefreshToken;
+        user_login.RefreshTokenExpiryTime = user.RefreshTokenExpiryTime;
         var find_user = await _userActions.GetUserByEmail(user.Email);
         if (find_user == null)
         {
+            user.Password = BC.HashPassword(user.Password);
             await _userActions.CreateUser(user);
             LoginTemplate loginTemplate = new LoginTemplate();
             loginTemplate.SU_001 = user;
             find_user = await _userActions.GetUserByEmail(user.Email);
             await _userGroups.AddUserToGroup(loginTemplate.SU_001,SU010_Types.User);
-            var jwt_resp = Login(loginTemplate.SU_001).Result.ExecuteResultAsync;
-            var resp = (OkObjectResult)jwt_resp.Target;
-            var aresp = resp.Value;
-            return Ok(aresp);
+            //var jwt_resp = Login(loginTemplate.SU_001).Result;
+            System.Net.HttpStatusCode status_code = System.Net.HttpStatusCode.Accepted;
+            try
+            {
+                var options = new RestClientOptions("https://localhost:5001")
+                {
+                    MaxTimeout = -1,
+                };
+                var client = new RestClient(options);
+                var request = new RestRequest("/api/User/Login", Method.Post);
+                var json = new JavaScriptSerializer().Serialize(user_login);
+                var body = json;
+                request.AddParameter("application/json", user_login, ParameterType.RequestBody);
+                var resp = client.ExecuteAsync(request).Result;
+                status_code = resp.StatusCode;
+                if (status_code == System.Net.HttpStatusCode.OK)
+                {
+                    return Ok(JsonSerializer.Deserialize<AuthenticatedResponse>(resp.Content));
+                }
+                else
+                {
+                    return StatusCode(Convert.ToInt32(status_code));
+                }
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(Convert.ToInt32(status_code));
+            }
         }
         else
         {
@@ -89,7 +126,7 @@ public class UserController : ControllerBase
     [AllowAnonymous]
     [HttpPost]
     [Route("Login")]
-    public async Task<ActionResult> Login(SU_001 user)
+    public async Task<IActionResult> Login(SU_001 user)
     {
         LoginTemplate login_template = new LoginTemplate();
         var find_user = await _userActions.GetUserByEmail(user.Email);
@@ -116,7 +153,14 @@ public class UserController : ControllerBase
             find_user.RefreshToken = aresp.AccessToken;
             find_user.RefreshTokenExpiryTime = DateTime.Now.AddMinutes(43200);
             await _context.SaveChangesAsync();
-            return Ok(aresp);
+            if (!BC.Verify(user.Password, find_user.Password))
+            {
+                return StatusCode(403);
+            }
+            else
+            {
+                return Ok(aresp);
+            }
         }
         else
         {

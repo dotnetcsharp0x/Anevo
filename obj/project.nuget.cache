@@ -1,11 +1,12 @@
 {
   "version": 2,
-  "dgSpecHash": "w7i87shqUGWvsXeBmC0y8ey+/DlU1qlM0FMdRHE/jaW6liuhqvyCBqJYrHFGEsPcIS9MyMK9etCVGW/li/KYFQ==",
+  "dgSpecHash": "SoFJuf3fG8FoYjoFVzY+1XCvLpAmbO7nN7SaDgczZhtzxRZca7JcAToSnnQdihy6BqS0ewleSarmIHeOYMcd8g==",
   "success": true,
   "projectFilePath": "C:\\Users\\New\\source\\repos\\Anevo\\Anevo.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\New\\.nuget\\packages\\azure.core\\1.25.0\\azure.core.1.25.0.nupkg.sha512",
     "C:\\Users\\New\\.nuget\\packages\\azure.identity\\1.7.0\\azure.identity.1.7.0.nupkg.sha512",
+    "C:\\Users\\New\\.nuget\\packages\\bcrypt.net-next\\4.0.3\\bcrypt.net-next.4.0.3.nupkg.sha512",
     "C:\\Users\\New\\.nuget\\packages\\humanizer.core\\2.14.1\\humanizer.core.2.14.1.nupkg.sha512",
     "C:\\Users\\New\\.nuget\\packages\\microsoft.aspnetcore.authentication.jwtbearer\\7.0.13\\microsoft.aspnetcore.authentication.jwtbearer.7.0.13.nupkg.sha512",
     "C:\\Users\\New\\.nuget\\packages\\microsoft.aspnetcore.openapi\\7.0.13\\microsoft.aspnetcore.openapi.7.0.13.nupkg.sha512",

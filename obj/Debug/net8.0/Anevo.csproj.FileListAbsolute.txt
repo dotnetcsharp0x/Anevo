@@ -82,3 +82,4 @@ C:\Users\New\source\repos\Anevo\obj\Debug\net8.0\refint\Anevo.dll
 C:\Users\New\source\repos\Anevo\obj\Debug\net8.0\Anevo.pdb
 C:\Users\New\source\repos\Anevo\obj\Debug\net8.0\Anevo.genruntimeconfig.cache
 C:\Users\New\source\repos\Anevo\obj\Debug\net8.0\ref\Anevo.dll
+C:\Users\New\source\repos\Anevo\bin\Debug\net8.0\BCrypt.Net-Next.dll
