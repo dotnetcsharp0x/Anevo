@@ -150,7 +150,7 @@ public class UserController : ControllerBase
             };
             aresp.AccessToken = cjwttoken.GenerateAccessToken(claims);
             aresp.RefreshToken = cjwttoken.GenerateRefreshToken();
-            find_user.RefreshToken = aresp.AccessToken;
+            find_user.RefreshToken = aresp.RefreshToken;
             find_user.RefreshTokenExpiryTime = DateTime.Now.AddMinutes(43200);
             await _context.SaveChangesAsync();
             if (!BC.Verify(user.Password, find_user.Password))
@@ -184,15 +184,14 @@ public class UserController : ControllerBase
         return resp;
     }
 
-    [AllowAnonymous]
     [HttpPost]
     [Route("refresh")]
-    public async Task<IActionResult> Refresh(TokenApiModel tokenApiModel)
+    public async Task<IActionResult> Refresh(AuthenticatedResponse tokenApiModel)
     {
         if (tokenApiModel is null)
             return BadRequest("Invalid client request");
-        string accessToken = tokenApiModel.AccessToken;
-        string refreshToken = tokenApiModel.RefreshToken;
+        string accessToken = tokenApiModel.AccessToken!;
+        string refreshToken = tokenApiModel.RefreshToken!;
         var principal = _tokenService.GetPrincipalFromExpiredToken(accessToken);
         var email = (from i in principal.Claims where i.Type=="Name" select i.Value).First();
         var user = _userActions.GetUserByEmail(email).Result;
@@ -200,7 +199,7 @@ public class UserController : ControllerBase
             return BadRequest("Invalid client request");
         var newAccessToken = _tokenService.GenerateAccessToken(principal.Claims);
         var newRefreshToken = _tokenService.GenerateRefreshToken();
-        user.RefreshToken = newAccessToken;
+        user.RefreshToken = newRefreshToken;
         await _context.SaveChangesAsync();
         return Ok(new AuthenticatedResponse()
         {
